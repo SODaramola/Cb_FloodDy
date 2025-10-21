@@ -1,6 +1,6 @@
 # Cb_FloodDy
 
-_A cluster-based temporal-attention framework for predicting cyclone-induced compound flood dynamics (DEM + meteorology + river discharge + water levels), with utilities for Voronoi cluster generation and Optuna-driven hyperparameter tuning._
+_A cluster-based temporal-attention framework  with utilities for Voronoi cluster generation and Optuna-driven hyperparameter tuning._
 
 ---
 
