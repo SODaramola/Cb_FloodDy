@@ -25,7 +25,6 @@ conda activate cb_flooddy
 # install from PyPI
 pip install Cb-FloodDy
 ```
-The repo ships with standard packaging metadata (see `pyproject.toml`/`setup.py`).
 
 ---
 
