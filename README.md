@@ -15,8 +15,6 @@ _A cluster-based temporal-attention framework  with utilities for Voronoi cluste
 
 ## Installation
 
-> Python 3.9+ recommended (tested up to 3.10). TensorFlow will use GPU if available.
-
 ```bash
 # (Optional) create a clean env
 conda create -n cb_flooddy python=3.10 -y
@@ -28,7 +26,7 @@ pip install Cb-FloodDy
 
 ---
 
-## Quick Start
+## Model Workflow
 
 ### 1) Voronoi clusters (create station-informed polygons)
 
@@ -103,7 +101,7 @@ print(summary)
 
 ---
 
-## Key APIs (selected)
+## Key APIs 
 
 ### `Cb_FloodDy.voronoi_clusters`
 - `load_station_points(station_dir, start_idx, end_idx, lon_name=None, lat_name=None) -> list[(lon, lat)]`
