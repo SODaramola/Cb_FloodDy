@@ -37,16 +37,16 @@ from pyproj import CRS
 from Cb_FloodDy.voronoi_clusters import run_workflow
 
 artifacts = run_workflow(
-    src_crs=CRS.from_epsg(4326),          # lon/lat
-    station_dir="path/to/water_level_stations",  # files like station_1.csv, station_2.csv, ...
-    station_range=(1, 21),                # inclusive indices
-    shapefile_path="GBay_cells_polygon.shp",     # domain/flood extent polygon(s)
-    combine_pairs=[(1, 19), (12, 21), (3, 18)],  # optional unions
-    x_ticks=[-95.5, -95.0, -94.5],        # optional map ticks
+    src_crs=CRS.from_epsg(4326),                  # lon/lat
+    station_dir="path/to/water_level_stations",   # files like station_1.csv, station_2.csv, ...
+    station_range=(1, 21),                        # i.e., 21 stations available, should be set to the available number of stations
+    shapefile_path="GBay_cells_polygon.shp",      # domain/flood extent polygon(s)
+    combine_pairs=[(1, 19), (12, 21), (3, 18)],   # optional unions
+    x_ticks=[-95.5, -95.0, -94.5],                # optional map ticks
     y_ticks=[29.0, 29.4, 29.8],
-    out_shapefile="voronoi_clusters.shp", # optional outputs
+    out_shapefile="voronoi_clusters.shp",         # optional outputs
     out_fig="voronoi_map.png",
-    reorder_by_station=True,              # ensure polygon i matches station i
+    reorder_by_station=True,                      # ensure polygon i matches station i
 )
 ```
 
@@ -64,13 +64,13 @@ summary = bo.run_optimization(
     train_water_depth_dir="data/water_depth_tifs/",  # y
     train_river_discharge_dir="data/river_discharge_tifs/",
     water_level_dir="data/water_levels_csvs/",
-    polygon_clusters_path="voronoi_clusters.shp",    # from step 1
+    polygon_clusters_path="voronoi_clusters.shp",                # from step 1
     sequence_length=6,
     n_trials=30,
     study_name="cb_flooddy_study",
     checkpoint_dir_BO="checkpoints/optuna",
     seed_value=3,
-    convlstm_filters=[16, 32, 48],          # search grids/ranges
+    convlstm_filters=[16, 32, 48],                               # search grids/ranges
     lstm_units=[32, 48],
     dense_units=[64, 128],
     l2_reg_range=(1e-7, 1e-4),
@@ -82,7 +82,7 @@ summary = bo.run_optimization(
     epochs=100,
     batch_size=2,
     val_split=0.2,
-    dem_files=["data/dem_t0.tif","data/dem_t1.tif"],  # tiled across time
+    dem_files=["data/dem_t0.tif","data/dem_t1.tif"],              # tiled across time
     dem_timesteps=[120, 240],
     visualize=True
 )
