@@ -17,7 +17,7 @@ _A cluster-based temporal-attention framework  with utilities for Voronoi cluste
 
 ```bash
 # (Optional) create a clean env
-conda create -n cb_flooddy python=3.10 -y
+conda create -n cb_flooddy -y
 conda activate cb_flooddy
 
 # install from PyPI
