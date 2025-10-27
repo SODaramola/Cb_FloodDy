@@ -1,16 +1,7 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
 
 
-get_ipython().run_line_magic('pip', 'install -U Cb-FloodDy')
 
-
-# ## Voronoi Workflow Parameters
-
-# In[3]:
-
+# Voronoi Workflow Parameters
 
 import os
 from pyproj import CRS
@@ -62,16 +53,7 @@ summary = voronoi_clusters.run_workflow(
 # summary  # show a summary dict
 
 
-# In[ ]:
-
-
-
-
-
-# ## Bayesian Optimization Workflow
-
-# In[ ]:
-
+# Bayesian Optimization Workflow
 
 from Cb_FloodDy import bayesian_opt_tuning as bo
 import os
@@ -153,16 +135,10 @@ summary = bo.run_optimization(
 summary
 
 
-# In[ ]:
 
 
 
-
-
-# ## Flood Depth Prediction
-
-# In[3]:
-
+# Flood Depth Prediction
 
 from Cb_FloodDy import model_prediction as mp
 import os
@@ -209,9 +185,6 @@ mp.run_predictions(
     # Reproducibility
     seed_value               = seed_value,
 )
-
-
-# In[ ]:
 
 
 
