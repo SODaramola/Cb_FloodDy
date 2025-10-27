@@ -1,6 +1,3 @@
-
-
-
 # Voronoi Workflow Parameters
 
 import os
@@ -50,7 +47,13 @@ summary = voronoi_clusters.run_workflow(
 #     lat_name="Latitude_dd",    # optional if auto-detect fails
 )
 
-# summary  # show a summary dict
+summary  # show a summary dict
+
+
+
+
+
+
 
 
 # Bayesian Optimization Workflow
@@ -133,6 +136,9 @@ summary = bo.run_optimization(
 )
 
 summary
+
+
+
 
 
 
