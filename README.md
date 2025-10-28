@@ -93,6 +93,109 @@ print(summary)
 
 ---
 
+Outputs saved after training:
+```
+checkpoint_BO/
+├─ trial_000/
+│  ├─ best_model.keras
+│  └─ ...
+├─ trial_001/
+│  ├─ best_model.keras
+│  └─ ...
+└─ artifacts/
+   ├─ normalization_params.npz
+   └─ cluster_masks.npy            # if created during training
+```
+---
+
+### 3) Generate flood‑depth predictions on a test event
+
+After training finishes, you’ll have a directory like:
+- `checkpoint_BO/`
+  - `trial_000/best_model.keras`
+  - `trial_001/best_model.keras`
+  - ...
+  - `artifacts/normalization_params.npz`
+  - `artifacts/cluster_masks.npy`
+
+Those are all you need (plus your test rasters and station CSVs) to run inference.
+
+```python
+from Cb_FloodDy import model_prediction as mp
+import os
+
+# === paths from training ===
+checkpoint_dir_BO     = "checkpoint_BO"             # same folder you passed into run_optimization(...)
+polygon_clusters_path = os.path.join(os.getcwd(),
+                                     "voronoi_clusters.shp")  # fallback if cluster_masks.npy is missing
+sequence_length       = 6                            # MUST match what you trained with
+seed_value            = 42                           # for reproducibility
+
+# name of the test case (e.g., a specific storm)
+test_name = "testingharvey"
+
+# everything for this storm/test lives under this folder:
+#   testingharvey/
+#       atm_pressure/            *.tif (1 per timestep)
+#       wind_speed/              *.tif
+#       precipitation/           *.tif
+#       river_discharge/         *.tif
+#       water_depth/             *.tif  (this is the “truth” flood depth; used for metrics)
+#       original_water_level/    *.csv  (one CSV per gauge/station)
+#       DEM/dem_idw.tif          DEM raster (broadcast across time)
+base_test_dir = os.path.join(os.getcwd(), test_name)
+
+mp.run_predictions(
+    # Required raster time series
+    test_atm_pressure_dir    = os.path.join(base_test_dir, "atm_pressure"),
+    test_wind_speed_dir      = os.path.join(base_test_dir, "wind_speed"),
+    test_precipitation_dir   = os.path.join(base_test_dir, "precipitation"),
+    test_river_discharge_dir = os.path.join(base_test_dir, "river_discharge"),
+    test_water_depth_dir     = os.path.join(base_test_dir, "water_depth"),
+
+    # Required water-level histories (CSV per station)
+    test_water_level_dir     = os.path.join(base_test_dir, "original_water_level"),
+
+    # DEM used for testing (single raster, broadcast internally)
+    test_dem_file            = os.path.join(base_test_dir, "DEM", "dem_idw.tif"),
+
+    # Training artifacts
+    checkpoint_dir_BO        = checkpoint_dir_BO,
+    polygon_clusters_path    = polygon_clusters_path,   # only used if cluster_masks.npy is missing
+
+    # Temporal setup (must match training)
+    sequence_length          = sequence_length,
+
+    # Output layout
+    output_root              = "predictions",           # parent folder for all outputs
+    test_name                = test_name,               # subfolder under output_root
+
+    # Reproducibility
+    seed_value               = seed_value,
+)
+```
+
+### What `run_predictions(...)` does
+
+- Rebuilds the exact input tensors the model saw during training:
+  - Stacks atmospheric pressure, wind speed, precipitation, discharge, and DEM into `(T, H, W, C)`.
+  - Cuts them into sliding windows of length `sequence_length` (e.g., 6 timesteps).
+  - Aligns those windows with:
+    - observed flood depth rasters (`water_depth/`) for evaluation,
+    - per‑station water‑level CSVs (`original_water_level/`) for the hydrodynamic signal.
+- Loads `normalization_params.npz` and `cluster_masks.npy` from `checkpoint_dir_BO/artifacts/` so test data use **the same normalization and masks** as training.
+  - If `cluster_masks.npy` isn’t there, it will rasterize `voronoi_clusters.shp` as a fallback.
+- Loops over every trial folder inside `checkpoint_BO` (e.g., `trial_000`, `trial_001`, …), loads the trial’s `best_model.keras`, and runs inference.
+
+For each trial it writes:
+- Per‑timestep predicted depth GeoTIFFs to  
+  `predictions/<test_name>/trial_XXX/<matching_original_filename>.tif`
+- A `summary_metrics.csv` in that same `trial_XXX/` folder with average MSE / RMSE / R² for that trial
+  (metrics use only valid pixels; NaN pixels in the truth are ignored).
+- An overall `all_trials_summary.csv` in  
+  `predictions/<test_name>/` comparing every trial’s aggregate skill.
+
+
 ## Data Expectations
 
 - **Raster inputs (.tif):** Each meteorological/hydrologic variable is a time-stack (one file per timestep), same shape & transform. The DEM can change by regime; provide `dem_files` + `dem_timesteps` whose counts sum to the total number of timesteps. Shape checks and tiling are handled for you.
