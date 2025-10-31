@@ -34,7 +34,7 @@ pip install Cb-FloodDy
 from pyproj import CRS
 from Cb_FloodDy.voronoi_clusters import run_workflow
 
-artifacts = run_workflow(
+clusters = run_workflow(
     src_crs=CRS.from_epsg(4326),                  # lon/lat
     station_dir="path/to/water_level_stations",   # files like station_1.csv, station_2.csv, ...
     station_range=(1, 21),                        # i.e., 21 stations available, should be set to the available number of stations
